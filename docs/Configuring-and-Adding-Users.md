@@ -1,4 +1,4 @@
-# Part 3 - Connecting VMs in Unraid and Creating Active Directory Users
+# Part 3 - Join Machine to Domain and Creating Active Directory Users
 
 ## Overview
 In this section, we configure two VMs running side by side in Unraid to communicate with each other over the same network bridge. We then join the Windows 11 VM to the Active Directory domain and create domain user accounts on Windows Server 2022.
