@@ -148,6 +148,7 @@ To confirm the user exists, run this in **PowerShell** on Windows Server:
 Get-ADUser -Filter * | Select Name, SamAccountName
 ```
 
+<img width="1273" height="946" alt="Screenshot 2026-03-09 at 8 50 31 PM" src="https://github.com/user-attachments/assets/0810f945-f6a2-4257-b463-065988969b73" />
 
 
 ---
