@@ -91,6 +91,18 @@ Add-Computer -DomainName "example.com" -Credential "example\Administrator" -Rest
 
 Enter the domain admin password when prompted. The machine will automatically restart.
 
+**or**
+
+1. Right-click **`This PC`** → Scroll down to **Domain or Workgroups** → Click **Change**
+2. Fill in the domain section: **example.com**
+3. Press **Okay**
+4. Fill in the domain information:
+
+| Field | Example |
+|---|---|
+| Username | Administrator |
+| Password | 123 |
+
 ### Step 6 — Verify Domain Join
 
 After reboot, open CMD on **Windows 11** and run:
@@ -111,6 +123,13 @@ To log in with a domain account, click **Other User** on the login screen and en
 Username: example\Administrator
 Password: <your domain admin password>
 ```
+
+**or** 
+
+1. Click **`Tools`** on Server Manger → Scroll down to **Active Directory Users and Computers** → Click **Change**
+2. Click **example.com** dropdown → Click **Computers**
+3. You should see Desktop joined
+<img width="1281" height="942" alt="Screenshot 2026-03-10 at 4 41 24 PM" src="https://github.com/user-attachments/assets/aa194189-f6c6-466c-816a-cba46239370d" />
 
 ---
 
