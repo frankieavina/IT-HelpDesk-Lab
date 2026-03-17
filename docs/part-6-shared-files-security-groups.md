@@ -114,6 +114,8 @@ This PC > Local Disk (C:) > Shares > [Your Share Name]
 
 The **Tech** folder will now appear as a mapped drive under **This PC** in File Explorer.
 
+<img width="1273" height="773" alt="Mapped-Drive" src="https://github.com/user-attachments/assets/1e4e49e4-3543-4223-896c-ce32abb8891f" />
+
 ---
 
 ## Part 5 — Using Security Groups for Folder Access
