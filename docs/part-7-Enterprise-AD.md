@@ -128,6 +128,9 @@ example.com
       └── 👤 lscott (Laura Scott)
 ```
 
+<img width="752" height="585" alt="Screenshot 2026-03-17 at 6 11 08 PM" src="https://github.com/user-attachments/assets/47f9e88b-dd12-4bfe-a004-5f3fc6bcd86a" />
+
+
 ---
 
 ## Part 2 — Creating Shared Folders
@@ -249,8 +252,3 @@ By the end of this section you should have:
 
 In a real enterprise environment, **Security Groups are always preferred** because they are easier to manage, audit, and scale as the organization grows. Adding or removing a user from a group automatically grants or revokes access to everything that group controls.
 
----
-
-## What's Next — Part 8
-
-In the next part we will continue building out the lab with additional IT help desk scenarios and configurations.
