@@ -1,0 +1,256 @@
+# Part 7 - Active Directory Structure, Shared Folders, Permissions, and Mapped Drives
+
+## Overview
+In this section, we build a proper enterprise-style Active Directory structure using Organizational Units (OUs), Security Groups, and Users. We then create dedicated shared folders for each department, apply permissions using Security Groups, and map network drives from the Windows 11 workstation.
+
+---
+
+## Environment
+| Machine | Role | IP Address |
+|---|---|---|
+| Windows Server 2022 VM (Ceres-DC-01) | Domain Controller / File Server | 10.0.0.10 |
+| Windows 11 VM | Domain-joined Workstation | 10.0.0.x |
+| Domain | example.com | — |
+
+---
+
+## Part 1 — Building the AD Structure
+
+### Step 1 — Create Organizational Units (OUs) via GUI
+
+Organizational Units allow you to organize users and resources by department, mirroring how real enterprise environments structure Active Directory.
+
+1. On **Ceres-DC-01** open **Server Manager**
+2. Click **Tools** → **Active Directory Users and Computers**
+3. Expand **`example.com`**
+4. Right-click **`example.com`** → **New** → **Organizational Unit**
+5. Create the following OUs:
+
+| OU Name | Purpose |
+|---|---|
+| `IT-HelpDesk` | IT support staff |
+| `HR` | Human Resources staff |
+| `Finance` | Finance department staff |
+| `Management` | Managers and executives |
+
+---
+
+### Step 2 — Create Security Groups via GUI
+
+Security Groups allow you to manage folder and resource access at a group level rather than individually per user.
+
+For each OU:
+1. Right-click the **OU** → **New** → **Group**
+2. Fill in the details:
+
+| OU | Group Name | Group Scope | Group Type |
+|---|---|---|---|
+| IT-HelpDesk | `GRP-IT-HelpDesk` | Global | Security |
+| HR | `GRP-HR` | Global | Security |
+| Finance | `GRP-Finance` | Global | Security |
+| Management | `GRP-Management` | Global | Security |
+
+> 💡 **Tip:** Always create the Security Group inside its matching OU by right-clicking the OU itself. This keeps your AD structure clean and organized.
+
+---
+
+### Step 3 — Create Users via GUI
+
+For each user:
+1. Right-click the **matching OU** → **New** → **User**
+2. Fill in the user details
+3. Set password and check **"Password never expires"** (for lab use)
+4. Click **Next** → **Finish**
+
+#### Users Created
+
+| OU | Full Name | Username | Password |
+|---|---|---|---|
+| IT-HelpDesk | Alice Johnson | ajohnson | P@ssword123 |
+| IT-HelpDesk | Brian Carter | bcarter | P@ssword123 |
+| HR | Maria Jones | mjones | P@ssword123 |
+| HR | Sandra Lee | slee | P@ssword123 |
+| Finance | David Kim | dkim | P@ssword123 |
+| Finance | Rachel Turner | rturner | P@ssword123 |
+| Management | James Wilson | jwilson | P@ssword123 |
+| Management | Laura Scott | lscott | P@ssword123 |
+
+> 💡 **Note:** In a production environment you would enforce password expiration and complexity policies. For this lab, disabling expiration keeps the focus on learning AD structure.
+
+---
+
+### Step 4 — Add Users to Their Security Groups
+
+1. In **Active Directory Users and Computers**, find the Security Group in its OU
+2. Right-click the group → **Properties** → **Members** tab
+3. Click **Add** → type the username → **Check Names** → **OK**
+4. Click **Apply** → **OK**
+
+#### Group Membership
+
+| Security Group | Members |
+|---|---|
+| `GRP-IT-HelpDesk` | ajohnson, bcarter |
+| `GRP-HR` | mjones, slee |
+| `GRP-Finance` | dkim, rturner |
+| `GRP-Management` | jwilson, lscott |
+
+#### Verify Group Members via PowerShell
+
+```powershell
+Get-ADGroupMember -Identity "GRP-IT-HelpDesk" | Select Name
+Get-ADGroupMember -Identity "GRP-HR" | Select Name
+Get-ADGroupMember -Identity "GRP-Finance" | Select Name
+Get-ADGroupMember -Identity "GRP-Management" | Select Name
+```
+
+---
+
+## Final AD Structure
+
+```
+example.com
+├── 📁 OU: IT-HelpDesk
+│     ├── 👥 GRP-IT-HelpDesk
+│     ├── 👤 ajohnson (Alice Johnson)
+│     └── 👤 bcarter (Brian Carter)
+├── 📁 OU: HR
+│     ├── 👥 GRP-HR
+│     ├── 👤 mjones (Maria Jones)
+│     └── 👤 slee (Sandra Lee)
+├── 📁 OU: Finance
+│     ├── 👥 GRP-Finance
+│     ├── 👤 dkim (David Kim)
+│     └── 👤 rturner (Rachel Turner)
+└── 📁 OU: Management
+      ├── 👥 GRP-Management
+      ├── 👤 jwilson (James Wilson)
+      └── 👤 lscott (Laura Scott)
+```
+
+---
+
+## Part 2 — Creating Shared Folders
+
+### Step 1 — Create the Folder Structure on Ceres-DC-01
+
+1. Open **File Explorer** on **Ceres-DC-01**
+2. Navigate to `C:\` and create a folder called **`Shares`**
+3. Inside `C:\Shares` create the following folders:
+
+```
+C:\Shares
+├── 📁 IT-HelpDesk
+├── 📁 HR
+├── 📁 Finance
+└── 📁 Management
+```
+
+---
+
+### Step 2 — Configure Sharing Permissions
+
+For each folder:
+1. Right-click the folder → **Properties**
+2. Go to **Sharing** tab → **Advanced Sharing**
+3. Check **"Share this Folder"**
+4. Click **Permissions** → select **Everyone** → click **Remove**
+5. Click **Add** → type the matching Security Group → **Check Names** → **OK**
+6. Give it **Full Control** → **Apply** → **OK**
+
+#### Sharing Permissions
+
+| Folder | Security Group | Permission |
+|---|---|---|
+| `IT-HelpDesk` | GRP-IT-HelpDesk | Full Control |
+| `HR` | GRP-HR | Full Control |
+| `Finance` | GRP-Finance | Full Control |
+| `Management` | GRP-Management | Full Control |
+
+---
+
+### Step 3 — Configure NTFS Security Permissions
+
+Sharing permissions control network access, but NTFS permissions control the actual file system access. Both need to be set.
+
+For each folder:
+1. Right-click the folder → **Properties** → **Security** tab
+2. Click **Edit** → **Add**
+3. Type the matching Security Group → **Check Names** → **OK**
+4. Set permission to **Modify** or **Full Control**
+5. Remove any users that should not have access
+6. Click **Apply** → **OK**
+
+---
+
+## Part 3 — Testing Share Access from Windows 11
+
+### Step 1 — Access the Shares
+
+1. Log into **Windows 11** with a domain user (e.g. `ajohnson`)
+2. Open **File Explorer** and type the server path in the address bar:
+```
+\\Ceres-DC-01
+```
+3. You should see all shared folders listed
+
+### Step 2 — Verify Permissions Are Working
+
+| Logged in as | Can Access | Should Get Access Denied |
+|---|---|---|
+| ajohnson (IT) | IT-HelpDesk | HR, Finance, Management |
+| mjones (HR) | HR | IT-HelpDesk, Finance, Management |
+| dkim (Finance) | Finance | IT-HelpDesk, HR, Management |
+| jwilson (Management) | Management | IT-HelpDesk, HR, Finance |
+
+> 💡 **Note:** Getting **Access Denied** on other department folders is the expected and correct result — it confirms your Security Group permissions are working properly.
+
+---
+
+## Part 4 — Mapping a Network Drive
+
+> 💡 **Interview Tip:** Mapping a network drive is one of the most frequently asked IT help desk interview questions. Know this step by step.
+
+1. On **Windows 11**, open **File Explorer**
+2. Right-click **This PC** → **Map Network Drive**
+3. Choose a **Drive Letter** (e.g. `Z:`)
+4. Enter the folder path:
+```
+\\Ceres-DC-01\IT-HelpDesk
+```
+5. Check **"Reconnect at sign-in"** so the drive persists after reboot
+6. Click **Finish**
+
+The department folder will now appear as a mapped drive under **This PC** in File Explorer.
+
+---
+
+## Summary
+
+By the end of this section you should have:
+
+- ✅ Created 4 Organizational Units (IT-HelpDesk, HR, Finance, Management)
+- ✅ Created a Security Group inside each OU
+- ✅ Created 2 users per department and placed them in the correct OU
+- ✅ Added all users to their matching Security Groups
+- ✅ Created `C:\Shares` on Ceres-DC-01 with a subfolder per department
+- ✅ Configured Sharing and NTFS permissions using Security Groups
+- ✅ Verified correct access and Access Denied from Windows 11
+- ✅ Mapped a department share as a network drive on Windows 11
+
+---
+
+## Key Takeaway
+
+| Method | Best Used When |
+|---|---|
+| Manually adding users to a share | Quick one-off access for a single person |
+| Security Groups | Managing access for teams or departments at scale |
+
+In a real enterprise environment, **Security Groups are always preferred** because they are easier to manage, audit, and scale as the organization grows. Adding or removing a user from a group automatically grants or revokes access to everything that group controls.
+
+---
+
+## What's Next — Part 8
+
+In the next part we will continue building out the lab with additional IT help desk scenarios and configurations.
